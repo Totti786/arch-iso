@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# Autostart Programs ----------------------------------------#
+
+# XDG Autostart 
+[[ ! $(pgrep -f polkit-gnome-authentication-agent) ]] && xdg-autostart & 
+
+# Restore Wallpaper
+wpgtk restore
+
+# Screenlocker
+xss-lock --ignore-xss -l lockscreen &
+
+# Keybinds
+killall -q -9 sxhkd
+sxhkd -c "$HOME"/.config/sxhkd/sxhkdrc "$HOME"/.config/sxhkd/i3-sxhkdrc &
+
+# Enable Super Keys For Menu
+killall -q -9 xcape
+xcape -e 'Super_L=Alt_L|F1' &
+xcape -e 'Super_R=Alt_L|F1' &
+
+# Polkit agent
+[[ ! $(pgrep -f polkit-gnome-authentication-agent) ]] && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+# Fix cursor
+xsetroot -cursor_name left_ptr &
+
+# xfce4-settings daemon
+xfsettingsd &
+
+# Compositor 
+compositor --start &
+
+# Power manager
+[[ ! "$(pgrep xfce4-power-man)" ]] && xfce4-power-manager &
+
+# Ambient light manager
+clight &
+
+# Touchpad Gestures
+if libinput list-devices | grep -qiw 'Touchpad'; then
+	killall -q -9 fusuma
+	fusuma -d &
+fi
+
+# Autotiling for i3
+autotiling &
+
+# Dunst
+dunst &
+
+# Fix the i3 colors
+"$HOME"/.config/i3/i3-reload
+
+# Launch Polybar
+"$HOME"/.config/polybar/launch.sh &
+
+# CopyQ
+copyq --start-server &
+
+# Conky
+conky.sh &

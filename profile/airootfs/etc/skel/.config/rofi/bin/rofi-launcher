@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+rofi \
+	-no-lazy-grab \
+	-show combi \
+	-modes combi \
+	-selected-row 0 \
+	-drun-display-format "{name}" \
+	-modi "filebrowser" \
+	-combi-modes "drun,recursivebrowser" \
+	-theme launcher

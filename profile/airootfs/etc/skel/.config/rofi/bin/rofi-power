@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+## This script should work with any Arch based system that uses systemd
+## The logout option only works with Openbox, i3 and BSPWM and Hyprland
+
+rofi_command="rofi -theme power-screen"
+
+# Options
+shutdown=""
+reboot=""
+lock=""
+suspend=""
+hibernate=""
+logout=""
+confirm=""
+
+confirm(){
+	local options="\n"
+	echo -e "$options" | rofi -dmenu -i \
+	     -no-fixed-num-lines \
+	     -p "Are You Sure? : " \
+	     -theme power-screen -theme-str "#listview { lines: 2; }"
+}
+
+# Variable passed to rofi
+options="$shutdown\n$reboot\n$lock\n$suspend\n$hibernate\n$logout"
+
+chosen="$(echo -e "$options" | $rofi_command -dmenu -selected-row 2)"
+case "$chosen" in
+    "$shutdown")
+		[[ "$(confirm)" == "$confirm" ]] && systemctl poweroff
+        ;;
+    "$reboot")
+		[[ "$(confirm)" == "$confirm" ]] && systemctl reboot
+        ;;
+    "$lock")
+		loginctl lock-session
+    	;;
+    "$suspend")
+		[[ "$(confirm)" == "$confirm" ]] && systemctl suspend 
+        ;;
+    "$hibernate")
+		[[ "$(confirm)" == "$confirm" ]] && systemctl hibernate
+        ;;
+    "$logout")
+		current_desktop=$(wmctrl -m | head -n1 | cut -d " " -f2) 
+		if [[ "$(confirm)" == "$confirm" ]]; then
+			loginctl kill-user $(whoami)
+			#if [[ "$current_desktop" == "Openbox" ]]; then
+				#openbox --exit
+			#elif [[ "$current_desktop" == "i3" ]]; then
+				#i3 exit
+			#elif [[ "$current_desktop" == "bspwm" ]]; then
+				#bspc quit
+			#elif [[ "$current_desktop" == "herbstluftwm" ]]; then
+				#herbstclient quit
+			#elif [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+				#hyprctl dispatch exit
+			#fi
+		fi
+        ;;
+esac

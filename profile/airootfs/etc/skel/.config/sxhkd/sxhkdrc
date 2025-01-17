@@ -1,0 +1,137 @@
+#               __    __       __
+#    ______  __/ /_  / /______/ /
+#   / ___/ |/_/ __ \/ //_/ __  /
+#  (__  )>  </ / / / ,< / /_/ /
+# /____/_/|_/_/ /_/_/|_|\__,_/
+#
+
+
+##------ Menus -------##
+
+alt + space
+	jgmenu_run
+
+##------- Keybindings -------##
+
+# Terminal (alacritty)
+super + Return
+	terminal --tiled
+
+# Drop-down Terminal
+alt + Return
+	terminal --drop
+
+# Floating Terminal
+super + shift + Return
+	terminal --float
+
+# Fullscreen Terminal
+super + t
+	terminal --full
+	
+##------ Utilities -------##
+
+# Rofi App Launcher
+alt + F1
+	rofi-utils --launch
+
+# Rofi Menus
+super + {x,s}
+	rofi-utils --{power,shot}
+
+# Rofi Media
+super + {a,n,m}
+	rofi-media --{anime,shows,movies}
+
+# Rofi Applets
+super + {r,b,y}	
+	{rofi-reader,rofi-bluetooth,ytfzf -fD}
+	
+##------ Applications -------##
+
+# Launch Apps
+super + {e,f,w,o,v,p,z}
+	{exo-open --launch FileManager,exo-open --launch WebBrowser,geany,obs,copyq toggle,color-picker,gtk-launch vesktop || gtk-launch discord}
+
+super + shift + {s,w,r}
+	{gtk-launch spotify-adblock || gtk-launch spotify,wpgtk pick,rofi-utils --record}
+
+# Terminal Apps
+ctrl + alt + {v,e,h}
+	terminal --float -e {vim,yazi,htop}
+
+# Lockscreen
+ctrl + alt + l
+   loginctl lock-session
+
+# Random Wallpaper
+ctrl + alt + w
+   wpgtk random
+
+##------- System Keys -------##
+
+# Brightness control
+XF86MonBrightness{Up,Down}
+	brightness{ --inc, --dec}
+
+# Auto Brightness control
+super + XF86MonBrightness{Up,Down}
+	clight.sh --{capture,toggle-pause}
+
+# Volume control
+XF86Audio{RaiseVolume,LowerVolume,Mute}
+	volume{ --inc, --dec, --toggle}
+
+# Media control
+XF86Audio{Next,Prev,Play,Pause,Stop}
+	playerctl {next,previous,play-pause,play-pause,stop}
+
+# Take a screenshot
+Print
+	shot --now
+
+# Take a screenshot of an area
+shift + Print
+	shot --area
+
+# Edit Screenshot
+ctrl + Print
+	shot --edit
+	
+# Extract text from screenshot
+alt + Print
+	shot --text
+
+# Other Function keys
+
+XF86Explorer
+	thunar
+	
+XF86Search
+	rofi-utils --launch
+	
+XF86Calculator
+	gnome-calculator
+
+XF86Tools
+	xfce4-settings-manager
+	
+##---------- Misc. ----------##
+
+# Restart Polybar
+super + shift + m
+	bar-style --reload
+
+# Kill window
+super + Escape
+	xkill
+
+# Switch window
+alt + Tab
+	windowswitch windowcd
+
+# Switch window (across worksapces)
+super + Tab
+	windowswitch window
+
+##---------- EOF ----------##

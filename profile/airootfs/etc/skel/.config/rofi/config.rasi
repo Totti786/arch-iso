@@ -1,0 +1,25 @@
+/**
+ * Author : Tarek 
+ * Github : @Totti786
+**/
+
+configuration {
+	show-icons:        			true;
+	icon-theme:       		    "Papirus";
+	terminal: 		            "alacritty";
+	cycle:               		false;
+	hide-scrollbar:   		    false;
+	disable-history: 		    false;
+	kb-cancel: 					"Escape,Alt+F1";
+	display-drun:               "";
+	display-run:                "";
+	display-filebrowser:        "";
+	display-recursivebrowser:   "";
+	display-window:             "";
+	display-calc:     	   		"";
+	display-combi: 				"";
+	drun-display-format:        "{name}";
+	window-format:              "{w} · {c} · {t}";
+}
+
+@theme "./themes/search.rasi"

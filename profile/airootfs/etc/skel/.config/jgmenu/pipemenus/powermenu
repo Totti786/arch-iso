@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+## Commands Executed By jgmenu Powermenu
+
+## Options #############################################
+if  [[ "$1" = "--logout" ]]; then
+	loginctl kill-user $(whoami)
+	#current_desktop=$(wmctrl -m | head -n1 | cut -d " " -f2) 
+	#if [[ "$current_desktop" == "Openbox" ]]; then
+		#openbox --exit
+	#elif [[ "$current_desktop" == "i3" ]]; then
+		#i3 exit
+	#elif [[ "$current_desktop" == "bspwm" ]]; then
+		#bspc quit
+	#elif [[ "$current_desktop" == "herbstluftwm" ]]; then
+		#herbstclient quit
+	#fi
+elif  [[ "$1" = "--lock" ]]; then
+	lockscreen
+elif  [[ "$1" = "--suspend" ]]; then
+	systemctl suspend && lockscreen
+elif  [[ "$1" = "--hibernate" ]]; then
+	systemctl hibernate && lockscreen
+elif  [[ "$1" = "--reboot" ]]; then
+	systemctl reboot
+elif  [[ "$1" = "--shutdown" ]]; then
+	systemctl poweroff
+else
+	menu+=("Lock,lockscreen")
+	menu+=("Logout,$0 --logout")
+	menu+=("Suspend,$0 --suspend")
+	menu+=("Hibernate,$0 --hibernate")
+	menu+=("Reboot,$0 --reboot")
+	menu+=("Shutdown,$0 --shutdown")
+	
+	printf '%s\n' "${menu[@]}"
+fi

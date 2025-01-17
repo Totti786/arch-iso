@@ -1,0 +1,109 @@
+#               __    __       __
+#    ______  __/ /_  / /______/ /
+#   / ___/ |/_/ __ \/ //_/ __  /
+#  (__  )>  </ / / / ,< / /_/ /
+# /____/_/|_/_/ /_/_/|_|\__,_/
+#
+
+##------ Menus -------##
+
+# Right click menu
+~button3
+	xqp 0 $(xdo id -N seat0 -n root) && jgmenu_run
+
+~button2
+	xqp 0 $(xdo id -N seat0 -n root) && \
+	windowswitch window "-monitor -3"
+
+super + ~button3
+	xqp 0 $(xdo id -N seat0 -n root) && ~/.config/jgmenu/pipemenus/jg-color alone
+
+##----------- i3 ------------##
+
+# Focus to the given desktop
+super + {1-8}
+    i3-msg workspace {1-8}
+    
+# Switch workspace
+ctrl + super + {Left,Right,Up,Down}
+	~/.config/i3/i3-workspaces {prev,next,prev,next}
+
+# Move to the next or the previous workspace
+super + {~button4, ~button5}
+	~/.config/i3/i3-workspaces {prev,next}
+
+# Send focused window to another workspace and switch to the workspace
+super + shift + {1-8}
+	i3-msg move container to workspace number{1-8}
+
+# Close App
+super + {q,c}
+	i3-msg kill
+
+# Change focus
+super + {j,k,l,semicolon}
+	i3-msg focus {left,down,up,right}
+
+super + {Left,Down,Up,Right}
+	i3-msg focus {left,down,up,right}
+
+# Split horizontal, vertical or cancel
+super + shift + {h,v}
+	i3-msg split {h,v}
+
+# Fullscreen
+super + shift + f
+    i3-msg fullscreen toggle
+
+# Toggle beetwen floating & tiled
+super + space
+    i3-msg floating toggle
+
+# Set the node flags
+super + shift + {x,c}
+	i3-msg layout {tabbed,toggle split}
+
+# Move focused window
+super + shift + {j,k,l,semicolon}
+	i3-msg move {left,down,up,right}
+
+super + shift + {Left,Down,Up,Right}
+	i3-msg move {left,down,up,right}
+
+# Resize focused window
+super + alt + {Left,Down,Up,Right}
+	i3-msg resize {shrink width,grow height,shrink height,grow width}
+
+# Make window omnipresent
+alt + F8
+	i3-msg sticky toggle
+
+# Move to Scratchpad
+super + shift + d
+	i3-msg sticky enable && i3-msg move scratchpad
+
+# Toggle Scratchpad
+super + d
+	i3-msg scratchpad show
+
+# Toggle hyprspace
+ctrl + shift + Return
+	~/.config/i3/overview
+
+# Reload Keybinding
+ctrl + alt + Escape
+    pkill -USR1 -x sxhkd
+
+# Quit i3
+ctrl + shift + q
+	i3-msg exit
+
+# Quit i3
+ctrl + shift + r
+	i3-msg restart
+
+# Restore Previous Workspace
+super + shift + q
+	~/.config/i3/i3-resurrect-dmenu
+
+##---------- EOF ----------##

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Required Font: Material Symbols
+
+rofi_command="rofi -theme power-screen"
+
+# Buttons
+declare -A options
+options=(
+  [""]="now"
+  [""]="area"
+  [""]="in5"
+  [""]="text"
+  [""]="qr"
+  [""]="trans"
+  [""]="upload"
+  [""]="read"
+  [""]="blur"
+  [""]="gif"
+  [""]="edit"
+)
+
+# Order of the options
+order=("" "" "" "" "" "" "" "" "" "" "")
+
+# Prepare the options string for rofi
+options_str=$(printf "%s\n" "${order[@]}")
+
+# Variable passed to rofi
+selection=$(echo -e "$options_str" | $rofi_command -dmenu -selected-row 0)
+
+[[ -n "$selection" ]] && shot "--${options[$selection]}"

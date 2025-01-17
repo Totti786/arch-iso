@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+source bar-style
+
+menu+=("^sep(Polybar (${bar_style^}))")
+menu+=("Change Style,^checkout(style)")
+	submenu+=("^tag(style)")
+	submenu+=("Base,bar-style --base")
+	submenu+=("Minimal,bar-style --minimal")
+	submenu+=("Bionic,bar-style --bionic")
+menu+=("Reload,bar-style --reload")
+menu+=("Edit Config,exo-open $polybar_conf/$bar_style/config.ini")
+menu+=("Edit Modules,exo-open $polybar_conf/$bar_style/modules.ini")
+menu+=("Edit Weather Data,exo-open $polybar_conf/scripts/info")
+
+printf '%s\n' "${menu[@]}" "${submenu[@]}"

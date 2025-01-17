@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Define the notify-send command
+notify_command="notify-send -a envycontrol -r 72 'envycontrol' 'A reboot is required for changes to take effect'"
+
+# Check if the 'envycontrol' command is available
+if command -v "envycontrol" >/dev/null 2>&1; then
+    # Get the current graphics mode
+    current_mode="$(envycontrol -q)"
+
+    if [[ "$current_mode" == "integrated" ]]; then
+        integrated_enabled=" (enabled)"
+    elif [[ "$current_mode" == "hybrid" ]]; then
+        hybrid_enabled=" (enabled)"
+    elif [[ "$current_mode" == "nvidia" ]]; then
+        nvidia_enabled=" (enabled)"
+    fi
+    
+	menu+=("^sep(envycontrol)")
+	menu+=("Integrated${integrated_enabled},pkexec envycontrol -s integrated && $notify_command")
+	menu+=("Hybrid${hybrid_enabled},pkexec envycontrol -s hybrid && $notify_command")
+	menu+=("NVIDIA${nvidia_enabled},pkexec envycontrol -s nvidia && $notify_command")
+	
+	printf '%s\n' "${menu[@]}"
+else
+    printf '%s\n' "^sep(envycontrol is not installed)"
+fi

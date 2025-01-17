@@ -1,0 +1,36 @@
+^tag(root-menu)
+Terminal Emulator,exo-open --launch TerminalEmulator,alacritty
+File Manager,exo-open --launch FileManager,system-file-manager
+Web Browser,exo-open --launch WebBrowser,firefox
+Text Editor,geany,geany
+Document Viewer,zathura,document-viewer
+Applications,^pipe(jgmenu_run apps)
+
+Recorder,^pipe(~/.config/jgmenu/pipemenus/recorder-pipe)
+Screenshot,^pipe(~/.config/jgmenu/pipemenus/shots-pipe)
+Preferences,^checkout(preferences)
+Keybinds, ~/.local/bin/conky.sh
+Settings Manager,xfce4-settings-manager
+Power Menu,^pipe(~/.config/jgmenu/pipemenus/powermenu)
+
+^tag(preferences)
+Back,^back()
+Window Manager,^pipe(~/.config/jgmenu/pipemenus/wm-pipe)
+Bar,^pipe(~/.config/jgmenu/pipemenus/bar-pipe)
+Compositor,^pipe(~/.config/jgmenu/pipemenus/compositor-pipe)
+Ambient Light,^pipe(~/.config/jgmenu/pipemenus/clight-pipe)
+Color Scheme,^pipe(~/.config/jgmenu/pipemenus/jg-color)
+^sep()
+Change Font,^pipe(~/.config/jgmenu/pipemenus/change-fonts)
+^sep()
+Update,^pipe(~/.config/jgmenu/pipemenus/update-pipe)
+^sep()
+Change Graphics,^pipe(~/.config/jgmenu/pipemenus/graphics-card)
+^sep()
+Change Wallpaper,sh ~/.local/bin/wpgtk pick
+Appearance Settings,xfce4-appearance-settings
+^sep()
+Power Settings,xfce4-power-manager-settings
+Audio Settings,pavucontrol
+Display Settings,xfce4-display-settings
+

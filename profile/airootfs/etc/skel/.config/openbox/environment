@@ -1,0 +1,6 @@
+# Set system-wide environment variables here for Openbox
+# User-specific variables should be placed in $HOME/.config/openbox/environment
+
+# Make our environment identity considered as GNOME (tdesktop affected, so it will using GTK file chooser)
+export XDG_CURRENT_DESKTOP=Openbox
+

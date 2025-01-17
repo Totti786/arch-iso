@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+
+# Dependencies: wpg jq zenity pastel xclip imagemagick bc notify-send jgmenu papirus-folder.sh wpgtk 
+
+# Set directory paths
+WALLPAPERS_DIR="$HOME/Pictures/Wallpapers"
+CACHE_DIR="$HOME/.cache/wal"
+COLORS_FILE="$CACHE_DIR/colors.json"
+WPG_DIR="$HOME/.config/wpg/schemes"
+SAVED_THEMES="$HOME/.themes/Saved"
+
+# Get the current wallpaper
+CURRENT_WALL="$(jq -r '.wallpaper' $COLORS_FILE)"
+
+# Get the current theme
+CURRENT_THEME="$WPG_DIR/$(echo $CURRENT_WALL | sed 'y/\/./__/')_dark_wal__1.1.0.json"
+
+# Read color scheme from JSON file
+color_scheme=($(jq -r '.colors[]' "$COLORS_FILE"))
+
+change_color(){
+    # Prompt user to choose a color
+    new_color="$(zenity --title="Choose a color" --color-selection --color=$1 | pastel format hex)"
+    
+    # Update the color values in the JSON file based on the selected color
+    if [ "$2" = "0" ]; then
+		jq --arg value "$new_color" '.colors.color0 = $value | .special.background = $value' "$COLORS_FILE" > "$CURRENT_THEME"    
+	elif [ "$2" = "15" ]; then
+		jq --arg value "$new_color" '.colors.color15 = $value | .special.foreground = $value | .special.cursor = $value' "$COLORS_FILE" > "$CURRENT_THEME"
+    else
+		jq --arg key "color$2" --arg value "$new_color" '.colors[$key] = $value' "$COLORS_FILE" > "$CURRENT_THEME"
+	fi
+    
+    # Copy the updated theme file to the colors.json
+    cat "$CURRENT_THEME" > "$COLORS_FILE"
+}
+
+change_color_here(){
+    # Change the color values directly in the theme file
+    if [ "$1" = "0" ]; then
+		jq --arg value "$2" '.colors.color0 = $value | .special.background = $value' "$COLORS_FILE" > "$CURRENT_THEME"
+    elif [ "$1" = "15" ]; then
+		jq --arg value "$2" '.colors.color15 = $value | .special.foreground = $value | .special.cursor = $value' "$COLORS_FILE" > "$CURRENT_THEME"
+    else
+		jq --arg key "color$1" --arg value "$2" '.colors[$key] = $value' "$COLORS_FILE" > "$CURRENT_THEME"
+    fi
+    
+    # Copy the updated theme file to the colors.json file
+    cat "$CURRENT_THEME" > "$COLORS_FILE"
+}
+
+change_scheme(){
+    colors=($(jq -r 'if has("color") then .color[] elif has("colors") then .colors[] else empty end' "$1"))
+    # Replace the colors in the first file
+    for ((i=0; i<${#colors[@]}; i++)); do
+        change_color_here "$i" "${colors[i]}"
+    done
+}
+
+add_scheme(){
+    # Prompt user to select a JSON file and copy it to the saved themes directory
+    file="$(zenity --file-selection --file-filter='JSON files (*.json) | *.json' --file-filter='Text files (*.txt) | *.txt')"
+    if [[ -n "$file" ]]; then 
+		if [[ $(cat $file | wc -l) -lt 2 ]]; then 
+			cat "$file" | jq > "$SAVED_THEMES"/${file##*/}
+		else
+			cp "$file" "$SAVED_THEMES"
+		fi
+    fi
+}
+
+notify_color(){
+	image=/tmp/$1.png
+    echo "$1" | tr -d "\n" | xclip -selection clipboard
+    convert -size 48x48 xc:"$1" "$image"
+    notify-send -a 'Color Picker' -u low -i "$image" "$1"
+}
+
+saved(){
+	if [[ "$(ls -A $SAVED_THEMES)" ]]; then
+	    for file in "$SAVED_THEMES"/* ;do
+			scheme=($(jq -r 'if has("color") then .color[] elif has("colors") then .colors[] else empty end' "$file"))
+	        altmenu+=("${file##*/},^checkout($file)")
+	   		altmenu1+=("^tag($file)")
+	   		altmenu1+=("Import Scheme,$0 change_scheme \"$file\"")
+	   		altmenu1+=("Delete Scheme,rm \"$file\"")
+	        for i in "${scheme[@]}"; do
+	            altmenu1+=("<tt><small>$i</small> <span bgcolor='$i'>                      </span></tt>,$0 notify_color \"$i\"")
+			done
+	        altmenu1+=("^sep(${file##*/})")
+	    done
+	fi
+	
+	altmenu+=("Select File,$0 add_scheme")
+	altmenu+=("Open Files Location,exo-open $SAVED_THEMES")
+	
+	printf '%s\n' "${altmenu[@]}"
+	printf '%s\n' "${altmenu1[@]}"
+}
+
+lighten_color(){
+	# Generate six different shades
+	for i in {1..4}; do
+	    increment=$(bc -l <<< "scale=2; 0.05 * $i")  # Increment lightness by 0.05
+		lighter+=($(pastel lighten "$increment" "$1" | pastel format hex))
+	done
+}
+
+darken_color(){
+	# Generate six different shades
+	for i in {1..4}; do
+	    increment=$(bc -l <<< "scale=2; 0.05 * $i")  # Increment darkness by 0.05
+		darker+=($(pastel darken "$increment" "$1" | pastel format hex))
+	done
+}
+
+shades(){
+	altmenu+=("^sep(<tt>Color <small>$1</small> <span bgcolor='$1'>    </span></tt>)")
+	altmenu+=("Copy Color,$0 notify_color \"$1\"")
+	altmenu+=("Set as Folder Color,papirus-folder.sh '${1}'")
+	if [[ "$2" == "1" ]]; then 
+		lighten_color "$(pastel mix -f 1.5 $1 ${color_scheme[8]})"
+		darker=($(pastel darken 0.05 "$(pastel mix -f 0.4 ${color_scheme[8]} $1)" | pastel format hex))
+	elif [[ "$2" == "8" ]]; then 
+		lighten_color "$(pastel mix -f 0.2 $1 ${color_scheme[7]})"
+		darken_color "$(pastel mix -f 1 $1 ${color_scheme[7]})"
+	elif [[ "$2" == "9" ]]; then 
+		lighten_color "$(pastel mix -f 0.5 ${color_scheme[8]} $1)"
+		darker=($(pastel darken 0.05 "$(pastel mix -f 0.8 ${color_scheme[8]} $1)" | pastel format hex))
+	elif [[ "$2" == "16" ]]; then 
+		lighten_color "$(pastel mix -f 0.5 $1 ${color_scheme[7]})"
+		darken_color "$(pastel mix -f 0.5 $1 ${color_scheme[7]})"
+	else
+		lighten_color "$1"		
+		darken_color "$1"		
+	fi
+	for c in "${lighter[@]}"; do
+		altmenu+=("<tt><small>$c</small> <span bgcolor='$c'>                      </span></tt>,$0 change_color_here \"$(( $2 - 1 ))\" \"$c\" ")
+	done
+	for c in "${darker[@]}"; do
+		altmenu+=("<tt><small>$c</small> <span bgcolor='$c'>                      </span></tt>,$0 change_color_here \"$(( $2 - 1 ))\" \"$c\" ")
+	done
+	altmenu+=("Chnage Color,$0 change_color \"$1\" \"$(( $2 - 1 ))\" ")
+	
+	printf '%s\n' "${altmenu[@]}"
+	printf '%s\n' "${altmenu1[@]}"
+}
+
+# Add wallpaper colors section
+menu+=("^sep(Wallpaper Colors)")
+menu+=("ReGenerate Colors,^checkout(regen)")
+submenu+=("^tag(regen)")
+submenu+=("^sep(Regenerate)")
+submenu+=("Manage Color Schemes,wpg")
+submenu+=("Saved Color Schemes,^pipe($0 saved)")
+submenu+=("Modify Colors,^checkout(modify)")
+submenu1+=("^tag(modify)")
+submenu1+=("Generate Light Theme,wpg -Ls \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu1+=("Increase Saturation,wpg --sat \"$CURRENT_WALL\" 0.1 && wpg -s \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu1+=("Decrease Saturation,wpg --sat \"$CURRENT_WALL\" -0.1 && wpg -s \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu1+=("Increase Brightness,wpg --brt \"$CURRENT_WALL\" 10 && wpg -s \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu1+=("Decrease Brightness,wpg --brt \"$CURRENT_WALL\" -10 && wpg -s \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu+=("Apply Colors,wpg -s \"$CURRENT_WALL\"")
+submenu+=("Shuffle Colors,wpg -z \"$CURRENT_WALL\" && wpg -s \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu+=("Reset Colors,wpg -R \"$CURRENT_WALL\" && wpg -s \"$CURRENT_WALL\" && rm \"${CURRENT_WALL}_wal_sample.png\"")
+submenu+=("Export Colors, mkdir -p $SAVED_THEMES && cp $COLORS_FILE \"$SAVED_THEMES/${CURRENT_WALL##*/}.json\"")
+
+for i in "${color_scheme[@]}"; do
+	menu+=("<tt><small>$i</small> <span bgcolor='$i'>                      </span></tt>,^pipe($0 shades \"${i}\" $((++n)))")
+done
+
+# Wallpaper selection section
+menu+=("^sep(Wallpapers)")
+userwallp=$(find "$WALLPAPERS_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | wc -l)
+menu+=("  Wallpapers (<small>${userwallp}</small>),^checkout(wallpapers)")
+submenu+=("^tag(wallpapers)")
+submenu+=("Set Random Wallpaper,wpgtk random")
+submenu+=("Pick a Wallpaper, wpgtk pick")
+menu+=("^sep(${CURRENT_WALL##*/})")
+
+
+alone() {
+    # Output combined entries to Jgmenu
+    printf '%s\n' "${menu[@]}" "${submenu[@]}" "${submenu1[@]}" "${submenu2[@]}" | jgmenu --at-pointer --simple
+}
+
+# Define main function to output results
+main() {
+	printf '%s\n' "${menu[@]}" "${submenu[@]}" "${submenu1[@]}" "${submenu2[@]}"
+}
+
+if [[ "$1" ]]; then "$@" ;else main ;fi

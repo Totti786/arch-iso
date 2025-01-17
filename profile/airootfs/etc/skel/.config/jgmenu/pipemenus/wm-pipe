@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# A pipemenu to manage the settings of different window managers
+
+if  [[ "$1" = "--border" ]]; then
+	if [[ "$2" ]]; then
+		width="$2"
+	else
+	    if command -v "zenity" >/dev/null 2>&1; then
+			width="$(zenity --scale --max-value 10 --text "Select Border Width:")"
+		else
+			notify-send "Error: zenity is not installed!"
+			exit 1
+		fi
+	fi
+	if [[ "$?" == 0 ]]; then
+		sed -i -e "s/window_border=.*/window_border=\"$width\"/g" "$HOME"/.theme
+		if [[ "$XDG_CURRENT_DESKTOP" == "i3" ]]; then
+			sed -i -e "s/pixel .*/pixel $width/g" "$HOME"/.config/i3/config &&
+			"$HOME"/.config/i3/i3-reload
+		elif [[ "$XDG_CURRENT_DESKTOP" == "bspwm" ]]; then
+			"$HOME"/.config/bspwm/bsp-border
+		fi
+	fi
+else
+	if [[ "$XDG_CURRENT_DESKTOP" == "bspwm" ]]; then
+			menu+=("^sep(bspwm)")
+			menu+=("Restart bspwm,bspc wm -r ")
+			menu+=("Restart sxhkd,pkill -USR1 -x sxhkd")
+			menu+=("^sep()")
+			menu+=("Edit Autostart,exo-open $HOME/.config/bspwm/autostart")
+			menu+=("Edit config,exo-open $HOME/.config/bspwm/bspwmrc")
+			menu+=("Edit keybinds,exo-open $HOME/.config/sxhkd/bspwm-sxhkdrc")
+			menu+=("Edit Border Width,$0 --border")
+	elif [[ "$XDG_CURRENT_DESKTOP" == "i3" ]]; then
+			menu+=("^sep(i3)")
+			menu+=("Reload i3,$HOME/.config/i3/i3-reload")
+			menu+=("Restart i3,i3-msg restart")
+			menu+=("Restart sxhkd,pkill -USR1 -x sxhkd")
+			menu+=("^sep()")
+			menu+=("Edit Autostart,exo-open $HOME/.config/i3/autostart")
+			menu+=("Edit config,exo-open $HOME/.config/i3/config")
+			menu+=("Edit keybinds,exo-open $HOME/.config/sxhkd/i3-sxhkdrc")
+			menu+=("Edit Border Width,$0 --border")
+	elif [[ "$XDG_CURRENT_DESKTOP" == "Openbox" ]]; then
+			menu+=("^sep(Openbox)")
+			menu+=("Restart,openbox --restart")
+			menu+=("Reconfigure,openbox --reconfigure")
+			menu+=("Settings,obconf")
+			menu+=("^sep()")
+			menu+=("Edit Autostart,exo-open $HOME/.config/openbox/autostart")
+			menu+=("Edit Keybinds,exo-open $HOME/.config/openbox/rc.xml")
+	fi
+	printf '%s\n' "${menu[@]}"
+fi

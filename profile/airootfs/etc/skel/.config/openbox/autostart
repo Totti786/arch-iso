@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# Autostart Programs ----------------------------------------#
+
+# Polkit agent
+[[ ! $(pgrep -f polkit-gnome-authentication-agent) ]] && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+# Restore Wallpaper
+wpgtk restore &
+
+# Screenlocker
+xss-lock --ignore-xss -l lockscreen &
+
+# xfce4-settings daemon
+xfsettingsd &
+
+# Enable Super Keys For Menu
+killall -q -9 xcape
+xcape -e 'Super_L=Alt_L|F1' &
+xcape -e 'Super_R=Alt_L|F1' &
+
+# Enable power management
+xfce4-power-manager --daemon &
+
+# Dunst (Notifications Daemon)
+dunst &
+
+# Compositor 
+compositor --start &
+
+# Ambient light manager
+clight &
+
+# Touchpad Gestures
+if libinput list-devices | grep -qiw 'Touchpad'; then
+	killall -q -9 fusuma
+	fusuma -d &
+fi
+
+# Launch Polybar
+"$HOME"/.config/polybar/launch.sh &
+
+## Launch System Tray
+"$HOME"/.config/polybar/scripts/systray &
+
+# CopyQ (Clipboard Daemon)
+copyq --start-server &
+
+# Plank (Dock)
+plank &
+
+nm-applet & 
+
+# Conky
+conky.sh &
+
+if [[ -f "/etc/calamares/launch.sh" ]]; then
+	sh -c "/etc/calamares/launch.sh"
+	sed -i '/^if \[\[ -f "\/etc\/calamares\/launch.sh" \]\]; then$/,/^fi$/d' "$0"
+else
+	sed -i '/^if \[\[ -f "\/etc\/calamares\/launch.sh" \]\]; then$/,/^fi$/d' "$0"
+fi

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+[[ -f "$HOME/.cache/wal/colors.sh" ]] && source "$HOME/.cache/wal/colors.sh"
+[[ -f "$HOME/.theme" ]] && source "$HOME/.theme"
+[[ -z "$bar_style" ]] && bar_style="base" top_padding="23"
+
+lock="$HOME"/.syshide.lock
+
+tray(){
+	gravity="NE"
+	color="$(pastel mix -f 0.4 $color8 $color0 | pastel format hex)"
+	
+	if [[ "$bar_style" == "base" ]]; then 
+		geometry="1x1-5+28"
+	elif [[ "$bar_style" == "minimal" ]]; then 
+		geometry="1x1-99-38"
+	elif [[ "$bar_style" == "bionic" ]]; then 
+		geometry="1x1-96+45"
+	fi
+	
+	tray_command=(stalonetray --background $color --geometry $geometry --grow-gravity $gravity --icon-gravity $gravity --vertical false --slot-size 32 --kludges force_icons_size)
+	
+	if [[ "$(pidof stalonetray)" ]]; then
+		if [[ ! -e "$lock" ]]; then
+			polybar-msg action "#systray.hook.1"
+			xdo hide -n stalonetray
+			touch "$lock"
+			pkill -f systray
+		else
+			polybar-msg action "#systray.hook.0"
+			xdo show -n stalonetray
+			xdo raise -n stalonetray
+			rm "$lock"
+			sleep 5 && tray
+		fi
+	else
+		"${tray_command[@]}" &
+		tray
+	fi
+}
+
+i3_tray(){
+	polytray="$(pgrep -a polybar | grep polytray | cut -d ' ' -f1)"
+	if [[ "$polytray" ]]; then
+		if [[ -e "$lock" ]]; then
+			polybar-msg action "#systray.hook.1"
+			xdo hide -p "$polytray"
+			rm "$lock"
+			pkill -f systray
+		else
+			polybar-msg action "#systray.hook.0"
+			xdo show -p "$polytray" 
+			touch "$lock"
+			sleep 5 && i3_tray
+		fi
+	else
+		polybar polytray -q -c "$HOME/.config/polybar/$bar_style/config.ini" & disown
+		i3_tray
+	fi
+}
+
+if [[ "$XDG_CURRENT_DESKTOP" == "i3" ]]; then 
+	i3_tray
+else
+	tray
+fi

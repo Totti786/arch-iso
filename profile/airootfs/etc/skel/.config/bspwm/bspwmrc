@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+## Environment
+export XDG_CURRENT_DESKTOP="bspwm"
+
+## Configuration ------------------------------------------#
+
+workspaces(){
+	name=1
+	for monitor in $(bspc query -M); do
+		bspc monitor ${monitor} -n "$name" -d '1' '2' '3' '4' '5' '6' '7' '8'
+		let name++
+	done
+}
+workspaces
+
+bspc config window_gap 10
+bspc config split_ratio 0.50
+"$HOME"/.config/bspwm/bsp-border
+bspc config borderless_monocle true
+bspc config gapless_monocle false
+bspc config single_monocle true
+bspc config focus_follows_pointer true
+
+## Window rules -------------------------------------------#
+
+# remove all rules first
+bspc rule -r *:*
+
+## special rules
+declare -a floating=(Lxappearance obs mpv float pop-up
+	Onboard Yad Viewnior Eog loupe scrcpy Steam Wpg
+	feh Nm-connection-editor stalonetray pavucontrol
+	copyq '*:*:Library' Xfce4-appearance-settings
+	Xfce4-mouse-settings Xfce4-settings-manager
+	Nsxiv Trackma-gtk steam org.gnome.Weather
+	Xfce4-display-settings Anki TelegramDesktop
+	KotatogramDesktop gnome-calculator syncplay
+	Xfce4-power-manager-settings '*:*:AudioRelay'
+	Blueman-manager Trackma-gtk Waypaper zenity
+	clight-gui file-roller)
+	
+for i in "${floating[@]}"; do
+   bspc rule -a "$i" state=floating follow=on focus=on
+done
+
+# Force tile windows
+declare -a tiled=(Zathura)
+for i in "${tiled[@]}"; do
+	bspc rule -a "$i" manage=on state=tiled
+done
+
+bspc rule -a '*:*:Picture-in-Picture' sticky=on state=floating
+bspc rule -a drop state=floating follow=on focus=on sticky=on layer=above locked=on 
+bspc rule -a Plank layer=above manage=off locked=on border=off state=floating focus=off
+
+## Autostart ----------------------------------------------#
+"$HOME"/.config/bspwm/autostart

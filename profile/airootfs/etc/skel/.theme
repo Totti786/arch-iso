@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Bar and window manager style settings
+bar_style="base"
+window_border="0"
+
+if [[ "$bar_style" == "base" ]];then
+	top_padding="23"
+	bottom_padding="23"
+	transparent="true"
+elif [[ "$bar_style" == "minimal" ]];then
+	top_padding="0"
+	bottom_padding="25"
+	transparent="true"
+elif [[ "$bar_style" == "bionic" ]];then
+	top_padding="35"
+	bottom_padding="0"
+	transparent="false"
+fi

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>image-straighten</icon>
+	<name>JXL</name>
+	<submenu>Convert to</submenu>
+	<unique-id>1723053614774156-1</unique-id>
+	<command>magick %f  &quot;$(basename %f | sed &apos;s/\.[^.]*$//&apos;).jxl&quot;</command>
+	<description>Convert to JXL</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+<action>
+	<icon>image-straighten</icon>
+	<name>JPG</name>
+	<submenu>Convert to</submenu>
+	<unique-id>1669732092996674-1</unique-id>
+	<command>magick %f -quality 90 &quot;$(basename %f | sed &apos;s/\.[^.]*$//&apos;).jpg&quot;</command>
+	<description>Convert to JPG</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+<action>
+	<icon>image-straighten</icon>
+	<name>PNG</name>
+	<submenu>Convert to</submenu>
+	<unique-id>1686859468146406-1</unique-id>
+	<command>magick %f -quality 80  &quot;$(basename %f | sed &apos;s/\.[^.]*$//&apos;).png&quot;</command>
+	<description>Convert to PNG</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+<action>
+	<icon>image-straighten</icon>
+	<name>AVIF</name>
+	<submenu>Convert to</submenu>
+	<unique-id>1686859468146406-1</unique-id>
+	<command>magick %f -quality 90 &quot;$(basename %f | sed &apos;s/\.[^.]*$//&apos;).avif&quot;</command>
+	<description>Convert to AVIF</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+<action>
+	<icon>cm_runterm</icon>
+	<name>Open Terminal Here</name>
+	<submenu></submenu>
+	<unique-id>1581593230771688-1</unique-id>
+	<command>exo-open --launch TerminalEmulator</command>
+	<description>Example for a custom action</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+<action>
+	<icon>go-parent-folder</icon>
+	<name>Open as root</name>
+	<submenu></submenu>
+	<unique-id>1622790717174452-1</unique-id>
+	<command>pkexec thunar %f</command>
+	<description>Open directory as root</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>document-edit-sign</icon>
+	<name>Edit as root</name>
+	<submenu></submenu>
+	<unique-id>1622790919788057-2</unique-id>
+	<command>pkexec geany %f</command>
+	<description>Edit file as root</description>
+	<range></range>
+	<patterns>*</patterns>
+	<text-files/>
+</action>
+<action>
+	<icon>kr_comparedirs</icon>
+	<name>Compare</name>
+	<submenu></submenu>
+	<unique-id>1622791692322694-4</unique-id>
+	<command>meld %F</command>
+	<description>Compare files and directories with  meld</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+	<text-files/>
+</action>
+<action>
+	<icon>kr_diskusage</icon>
+	<name>Disk Usage</name>
+	<submenu></submenu>
+	<unique-id>1622791401529558-3</unique-id>
+	<command>alacritty -e ncdu %F</command>
+	<description>Disk usages by directory and its sub directories</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>cloud-upload</icon>
+	<name>Upload Image</name>
+	<submenu></submenu>
+	<unique-id>1722377509428801-1</unique-id>
+	<command>shot --upload %f</command>
+	<description>Uploads the image to imgur</description>
+	<range>*</range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+<action>
+	<icon>view-preview</icon>
+	<name>Set as wallpaper</name>
+	<submenu></submenu>
+	<unique-id>1622798756568291-1</unique-id>
+	<command>wpgtk wall %f</command>
+	<description>Set wallpaper and change color scheme</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>documentation</icon>
+	<name>Merge Pdfs</name>
+	<submenu></submenu>
+	<unique-id>1691578687766230-1</unique-id>
+	<command>pdftk %F cat output merged.pdf</command>
+	<description>Merges pdf files using pdftk</description>
+	<range>2-1000</range>
+	<patterns>*.pdf</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>debug-run-cursor</icon>
+	<name>Custom Rename</name>
+	<submenu></submenu>
+	<unique-id>1691602018323142-1</unique-id>
+	<command> thunar --bulk-rename %f</command>
+	<description>Bulk rename for a single file</description>
+	<range>1-1</range>
+	<patterns>*</patterns>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>object-locked</icon>
+	<name>Encrypt File</name>
+	<submenu></submenu>
+	<unique-id>1713659756832081-1</unique-id>
+	<command>gpg -c %f</command>
+	<description>Encrypts files using gpg </description>
+	<range>*</range>
+	<patterns>*</patterns>
+	<text-files/>
+</action>
+<action>
+	<icon>tools-rip-video-cd</icon>
+	<name>Compress Video</name>
+	<submenu></submenu>
+	<unique-id>1725895236679465-1</unique-id>
+	<command></command>
+	<description>Compress videos using ffmpeg</description>
+	<range>*</range>
+	<patterns>*</patterns>
+</action>
+</actions>
