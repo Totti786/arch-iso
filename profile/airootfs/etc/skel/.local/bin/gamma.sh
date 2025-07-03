@@ -2,7 +2,7 @@
 
 # Variables
 gamma_mode=off
-temperature=4000
+temperature=4600
 increment=200
 
 # Function to change gamma mode state in the script
@@ -16,7 +16,7 @@ change_mode() {
 change_temp() {
   if (( "$2" > 1000 )) && (( "$2" < 16000 )); then
     sed -i "s/temperature=$1/temperature=$2/g" "$0"
-    gammastep -P -O $((temperature + increment))
+    gammastep -P -O $((temperature + increment)) & disown
   fi
 }
 
@@ -26,7 +26,7 @@ if pgrep clight > /dev/null && [[ -n "$(clight.sh --gamma-status)"  ]]; then
   case "$1" in 
     --toggle)
       clight.sh --toggle-gamma
-      #[[ $(pidof polybar) ]] && polybar-msg action "#auto-gamma.hook.1"
+      [[ $(pidof polybar) ]] && polybar-msg action "#auto-gamma.hook.1"
 	  ;;
     --toggle-ambient)
       clight.sh --toggle-ambient-gamma

@@ -7,12 +7,12 @@ swipe:
       sendkey: 'LEFTALT+LEFT'
 
     up:
-      workspace: 'prev'
+      command: 'workspace prev'
       threshold: 0.1
       interval: 1.8
 
     down:
-      workspace: 'next'
+      command: 'workspace next'
       threshold: 0.1
       interval: 1.8
         

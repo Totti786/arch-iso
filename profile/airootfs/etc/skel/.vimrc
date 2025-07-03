@@ -9,6 +9,11 @@ nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
+" Remap hjkl to jkl;
+noremap j h
+noremap k j
+noremap l k
+noremap ; l
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins

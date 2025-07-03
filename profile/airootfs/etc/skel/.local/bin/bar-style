@@ -4,24 +4,25 @@
 [[ -f "$HOME/.theme" ]] && source "$HOME/.theme"
 [[ -z "$bar_style" ]] && bar_style="base"
 
+polybar_conf="$HOME/.config/polybar"
+pipe_dir="$HOME/.config/jgmenu/pipemenus"
+
 toggle_transparency(){
-	wpgtk_dir="$HOME/.local/bin/wpgtk"
-	pipe_dir="$HOME/.config/jgmenu/pipemenus"
 	if [[ "$1" == "off" ]]; then 
 		compositor --disable-opacity
 		compositor --enable-shadows
 		"$pipe_dir"/wm-pipe --border 0
-		sed -i "s/alpha=.*/alpha='FF'/" "$wpgtk_dir"
+		sed -i "s/transparency=.*/transparency='false'/" "$HOME/.theme"
 	elif [[ "$1" == "on" ]]; then
 		compositor --enable-opacity
 		compositor --disable-shadows
 		"$pipe_dir"/wm-pipe --border "$window_border"
-		sed -i "s/alpha=.*/alpha='70'/" "$wpgtk_dir"
+		sed -i "s/transparency=.*/transparency='true'/" "$HOME/.theme"
 	fi	
 }
 
 reload(){
-	wpgtk partial
+	wpgtk --reload
 }
 
 base(){

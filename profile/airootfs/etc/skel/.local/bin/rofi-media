@@ -148,14 +148,14 @@ process_media(){
 			if [[ "$name" =~ ([1][9][0-9]{2}|20[0-9]{2}) ]]; then
 				# Get the year if present and strip the title of extra info
 				year="${BASH_REMATCH[1]}"
-				title=$(echo "$name" | sed -e "s/$year.*//" -e 's/^\[.*\] \(.*\) - .*/\1/' -e 's/ - / /g' -e 's/\[[^]]*\]//g' -e 's/([^)]*)//g' -e 's/{[^}]*}//g' -e 's/[._()]/ /g' -e 's/[[:space:]]\+/ /g; s/^[ \t]*//; s/[ \t]*$//' \
+				title=$(echo "$name" | sed -e "s/$year.*//" -e 's/[(].*$//' -e 's/^\[.*\] \(.*\) - .*/\1/' -e 's/ - / /g' -e 's/\[[^]]*\]//g' -e 's/([^)]*)//g' -e 's/{[^}]*}//g' -e 's/[._()]/ /g' -e 's/[[:space:]]\+/ /g; s/^[ \t]*//; s/[ \t]*$//' \
 						-e 's/[[:space:]]\([Ss][Ee][Aa][Ss][Oo][Nn] [[:digit:]]\{1,2\}\|[Ss][0-9]\{1,2\}\(-[0-9]\{1,2\}\)\?\|[Ss][0-9]\{1,2\}[Ee][0-9]\{1,2\}\)[[:space:]]\{0,\}.*$//')
 				# Check if title is empty or only contains the year
 				# If title is empty or only contains spaces, set title to the year itself
 				[[ -z "$title" || "$title" =~ ^[[:space:]]*$ ]] && title="$year"
 			else
 				# Remove trailing spaces
-				title=$(echo "$name" | sed -e 's/^\[.*\] \(.*\) - .*/\1/'  -e 's/ - / /g' -e 's/\[[^]]*\]//g' -e 's/([^)]*)//g' -e 's/{[^}]*}//g' -e 's/[._()]/ /g' -e 's/[[:space:]]\+/ /g; s/^[ \t]*//; s/[ \t]*$//' \
+				title=$(echo "$name" | sed -e 's/[(].*$//' -e 's/^\[.*\] \(.*\) - .*/\1/'  -e 's/ - / /g' -e 's/\[[^]]*\]//g' -e 's/([^)]*)//g' -e 's/{[^}]*}//g' -e 's/[._()]/ /g' -e 's/[[:space:]]\+/ /g; s/^[ \t]*//; s/[ \t]*$//' \
 						-e 's/[[:space:]]\([Ss][Ee][Aa][Ss][Oo][Nn] [[:digit:]]\{1,2\}\|[Ss][0-9]\{1,2\}\(-[0-9]\{1,2\}\)\?\|[Ss][0-9]\{1,2\}[Ee][0-9]\{1,2\}\)[[:space:]]\{0,\}.*$//')
 				year=""
 			fi
@@ -171,8 +171,13 @@ process_media(){
 
 		# Set the clean version of the title in the player
 		if [[ "$media_type" == "movies" ]]; then
-			exec_command="mpv --speed=$speed --write-filename-in-watch-later-config --save-position-on-quit"
-			exec_command+=" --force-media-title=\"$title\" --title=\"$title\" \"$line\""
+			if [[ "$player" == "syncplay" ]]; then
+				exec_command="syncplay --player-path "$(command -v mpv)" \"$line\""
+				#exec_command+=" --force-media-title=\"$title\" --title=\"$title\" \"$line\""
+			else
+				exec_command="mpv --speed=$speed --write-filename-in-watch-later-config --save-position-on-quit"
+				exec_command+=" --force-media-title=\"$title\" --title=\"$title\" \"$line\""
+			fi
 		fi
 
 		# Create a list of used posters
@@ -277,17 +282,17 @@ play_media() {
 		--start="$start_position"
 	)
 
-	# Find the subtitle directory within the same path as the media file
-	local subs_directory="$(find -L "${file_path%/*}" -maxdepth 1 -mindepth 1 -type d | grep -i 'subs' | head -n 1)"
+	## Find the subtitle directory within the same path as the media file
+	#local subs_directory="$(find -L "${file_path%/*}" -maxdepth 1 -mindepth 1 -type d | grep -i 'subs' | head -n 1)"
 
-	# If a subtitle directory is found, append subtitle options to the player command
-	if [[ -n "$subs_directory" ]]; then
-		local file_name="${file_path##*/}"	# Get the base filename from file_path
-		file_name="${file_name%.*}"					# Remove the file extensione
+	## If a subtitle directory is found, append subtitle options to the player command
+	#if [[ -n "$subs_directory" ]]; then
+		#local file_name="${file_path##*/}"	# Get the base filename from file_path
+		#file_name="${file_name%.*}"					# Remove the file extensione
 
-		# Append subtitle options to the player command
-		player_cmd+=(--sub-auto=all --sub-file-paths="${subs_directory}/${file_name}")
-	fi
+		## Append subtitle options to the player command
+		#player_cmd+=(--sub-auto=all --sub-file-paths="${subs_directory}/${file_name}")
+	#fi
 
 	# Handle playback with different players
 	case "$player" in

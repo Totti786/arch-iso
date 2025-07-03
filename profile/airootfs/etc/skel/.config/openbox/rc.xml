@@ -438,12 +438,12 @@
     <!-- Move to next/prev desktop -->
     <keybind key="W-C-Left">
       <action name="Execute">
-        <command>~/.config/openbox/ob-workspaces prev</command>
+        <command>workspace prev</command>
       </action>
     </keybind>
     <keybind key="W-C-Right">
       <action name="Execute">
-        <command>~/.config/openbox/ob-workspaces next</command>
+        <command>workspace next</command>
       </action>
     </keybind>
     <!-- Media Controls-->
@@ -507,6 +507,16 @@
     <keybind key="XF86MonBrightnessDown">
       <action name="Execute">
         <command>brightness --dec</command>
+      </action>
+    </keybind>
+    <keybind key="W-XF86MonBrightnessUp">
+      <action name="Execute">
+        <command>clight.sh --capture</command>
+      </action>
+    </keybind>
+    <keybind key="W-XF86MonBrightnessDown">
+      <action name="Execute">
+        <command>clight.sh --toggle-pause</command>
       </action>
     </keybind>
     <!-- Screenshot Keys -->
@@ -714,13 +724,13 @@
     <!-- Change Wallpaper-->
     <keybind key="W-S-w">
       <action name="Execute">
-        <command>wpgtk pick</command>
+        <command>wpgtk --pick</command>
       </action>
     </keybind>
     <!-- Random Wallpaper-->
     <keybind key="C-A-w">
       <action name="Execute">
-        <command>wpgtk random</command>
+        <command>wpgtk --random</command>
       </action>
     </keybind>
     <!-- Spotify -->
@@ -814,12 +824,12 @@
       </mousebind>
       <mousebind action="Press" button="W-Up">
         <action name="Execute">
-          <command>~/.config/openbox/ob-workspaces prev</command>
+          <command>workspace prev</command>
         </action>
       </mousebind>
       <mousebind action="Press" button="W-Down">
         <action name="Execute">
-          <command>~/.config/openbox/ob-workspaces next</command>
+          <command>workspace next</command>
         </action>
       </mousebind>
     </context>
@@ -1035,12 +1045,12 @@
       </mousebind>
       <mousebind action="Press" button="W-Up">
         <action name="Execute">
-          <command>~/.config/openbox/ob-workspaces prev</command>
+          <command>workspace prev</command>
         </action>
       </mousebind>
       <mousebind action="Press" button="W-Down">
         <action name="Execute">
-          <command>~/.config/openbox/ob-workspaces next</command>
+          <command>workspace next</command>
         </action>
       </mousebind>
     </context>

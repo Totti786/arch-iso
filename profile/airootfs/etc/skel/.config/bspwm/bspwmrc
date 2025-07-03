@@ -28,7 +28,7 @@ bspc config focus_follows_pointer true
 bspc rule -r *:*
 
 ## special rules
-declare -a floating=(Lxappearance obs mpv float pop-up
+declare -a floating=(Lxappearance obs mpv Alacritty-float pop-up
 	Onboard Yad Viewnior Eog loupe scrcpy Steam Wpg
 	feh Nm-connection-editor stalonetray pavucontrol
 	copyq '*:*:Library' Xfce4-appearance-settings
@@ -38,20 +38,20 @@ declare -a floating=(Lxappearance obs mpv float pop-up
 	KotatogramDesktop gnome-calculator syncplay
 	Xfce4-power-manager-settings '*:*:AudioRelay'
 	Blueman-manager Trackma-gtk Waypaper zenity
-	clight-gui file-roller)
+	clight-gui file-roller snapshot)
 	
 for i in "${floating[@]}"; do
    bspc rule -a "$i" state=floating follow=on focus=on
 done
 
 # Force tile windows
-declare -a tiled=(Zathura)
+declare -a tiled=(Zathura Alacritty)
 for i in "${tiled[@]}"; do
 	bspc rule -a "$i" manage=on state=tiled
 done
 
-bspc rule -a '*:*:Picture-in-Picture' sticky=on state=floating
-bspc rule -a drop state=floating follow=on focus=on sticky=on layer=above locked=on 
+bspc rule -a '*:*:Picture-in-Picture' sticky=on state=floating border=off
+bspc rule -a Alacritty-drop state=floating follow=on focus=on sticky=on layer=above locked=on 
 bspc rule -a Plank layer=above manage=off locked=on border=off state=floating focus=off
 
 ## Autostart ----------------------------------------------#

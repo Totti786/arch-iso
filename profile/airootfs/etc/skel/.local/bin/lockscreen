@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$(playerctl -i kdeconnect -p %any status)" == "Playing" ]; then
+if playerctl -i kdeconnect -a status | grep -q '^Playing$'; then
 	playerctl -i kdeconnect -a pause
 fi
 
@@ -75,9 +75,9 @@ if [[ "$XDG_SESSION_TYPE" == "x11" ]] && [[ -z $(pgrep i3lock) ]]; then
 		--greeter-text="Type to unlock!" \
 		--greeter-font="$font" \
 		--greeter-size=18 \
-		--greeter-color=${red:1} \
-		--ind-pos="w-960:h-200"
+		--greeter-color=${FG:1} \
+		--ind-pos="w-960:h-200" &
 elif [[ -z "$(pgrep hyprlock)" ]]; then
-	playerctl.sh --art & 
+	playerctl.sh --art &
 	hyprlock
 fi

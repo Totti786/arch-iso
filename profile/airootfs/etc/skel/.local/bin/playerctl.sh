@@ -9,12 +9,11 @@
 
 ## Dependencies:
 # - `playerctl` for interacting with media players and retrieving metadata
-# - `polybar` for displaying media player information on the status bar
-# - `xrdb` to query color settings from the X resource database
-# - `ImageMagick (magick)` for image processing and generating cover art
+# - `imagemagick (magick)` for image processing and generating cover art
 # - `curl` for downloading cover art from URLs
-# - `zscroll` for scrolling text in Polybar
-# - ` awk, grep, cut, basename, file, mkdir, rm, echo, wait:` for various command-line operations
+# - `xorg-xrdb` to query color settings from the X resource database (optional)
+# - `polybar` for displaying media player information on the status bar (optional)
+# - `zscroll` for scrolling text in Polybar (optional)
 
 # Get the status of the media player using playerctl
 playerctl_status=$(playerctl status 2>&1)
@@ -39,51 +38,54 @@ metadata(){
 }
 
 # Function to get the icon of the currently active media player
-player_icon(){
-	# Exit if no players are found
-	if [[ "$playerctl_status" == "No players found" ]]; then exit 0 ;fi
-	
-	# Get the name of the active player
-	player_name="$(playerctl -l | head -n1 | cut -f1 -d ".")"
-	
-	# Define icons for specific players
-	declare -A player_icons=(
-		["spotify"]="󰓇"
-		["firefox"]="󰈹"
-		["kdeconnect"]=""
-		["vlc"]="󰕼"
-		["mpv"]=""
-		["rhythmbox"]="󰓃"
-		["chromium"]=""
-		["plasma-browser-integration"]="󰈹"
-	)
-	
-	# Get the icon for the active player
-	icon="${player_icons[$player_name]}"
+player_icon() {
+    # Exit if no players are found
+    [[ "$playerctl_status" == "No players found" ]] && exit 0
+
+    # Get the name of the active player
+    player_name="$(playerctl -l | head -n1 | cut -f1 -d ".")"
+
+    # Define icons for specific players
+    declare -A player_icons=(
+        ["spotify"]="󰓇"
+        ["firefox"]="󰈹"
+        ["kdeconnect"]=""
+        ["vlc"]="󰕼"
+        ["mpv"]=""
+        ["rhythmbox"]="󰓃"
+        ["chromium"]=""
+        ["Gapless"]=""
+        ["plasma-browser-integration"]="󰈹"
+    )
+
+    # Get the icon for the active player or fallback icon
+    player_icon="${player_icons[$player_name]:-"󰎇"}"
 }
 
 # Function to get the name and icon of the currently active media player
-player_name(){
-	# Exit if no players are found
-	if [[ "$playerctl_status" == "No players found" ]]; then exit 0 ;fi
-	
-	# Get the name of the active player
-	player_name="$(playerctl -l | head -n1 | cut -f1 -d ".")"
-	
-	# Define names and icons for specific players
-	declare -A player_icons=(
-		["spotify"]="Spotify "
-		["firefox"]="Firefox 󰈹"
-		["kdeconnect"]="Phone "
-		["vlc"]="VLC 󰕼"
-		["mpv"]="mpv "
-		["rhythmbox"]="Rhythmbox 󰓃"
-		["chromium"]="Chromium "
-		["plasma-browser-integration"]="Firefox 󰈹"
-	)
-	
-	# Get the name and icon for the active player
-	icon="${player_icons[$player_name]}"
+player_name() {
+    # Exit if no players are found
+    [[ "$playerctl_status" == "No players found" ]] && exit 0
+
+    # Get the name of the active player
+    player_name="$(playerctl -l | head -n1 | cut -f1 -d ".")"
+
+    # Handle special cases for specific players
+    case "$player_name" in
+        "mpv") friendly_name="mpv" ;;
+        "plasma-browser-integration") friendly_name="Firefox" ;;
+        "kdeconnect") friendly_name="Phone" ;;
+        *) 
+            # Capitalize the first letter of the player name for general cases
+            friendly_name="${player_name^}"
+            ;;
+    esac
+
+    # Get the icon by calling the player_icon function
+    player_icon
+
+    # Combine friendly name and icon into a single variable
+    player_name="$friendly_name $player_icon"
 }
 
 # Function to display current playing information and player icon
@@ -94,7 +96,7 @@ player(){
 	else
 		format="{{ title }}: {{ artist }}"
 	fi
-		
+
 	player_icon
 	current="$(metadata "$format")"
 	echo "$current" "${icon:-}"
@@ -105,45 +107,42 @@ cover_art(){
 	# Retrieve the artwork URL
 	url=$(metadata "{{ mpris:artUrl }}")
 	fallback_cover="/tmp/cover"
-	
+	player_file="/tmp/player"
+
+	cache_dir="$HOME/.cache/playerctl"
+	mkdir -p "$cache_dir"
+	filename="${url##*/}"
+	cover="$cache_dir/${filename%.*}"
+
 	# Remove fallback cover if no players are found
 	if [[ "$playerctl_status" == "No players found" ]]; then
-	    [[ -f "$fallback_cover" ]] &&  rm "$fallback_cover"
+	    [[ -f "$fallback_cover" ]] && rm "$fallback_cover" "$player_file"
 	else
-		if [[ ! -f "$fallback_cover" ]];then
-			# Create a fallback cover image with a colored background and icon
+		# Create a fallback cover image with a colored background and icon
+		player_icon
+		if [[ "$player_name" != "$(cat $player_file)" ]]; then
+			echo "$player_name" > "$player_file"
 		    eval $(xrdb -query | awk '/color0/{print "color0="$NF} /color7/{print "color7="$NF}')
 		    magick -size 128x128 xc:"$color0" png:"$fallback_cover"
 		    magick "$fallback_cover" -gravity center -fill "$color7" \
-		    -font /usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf \
-		    -pointsize 50 -annotate 0 "󰎇" "$fallback_cover"
-	    fi
+		    -font '/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf' \
+		    -pointsize 60 -annotate 0 "$player_icon" "$fallback_cover"
+		fi
 	fi
-	
+
 	# Check if the URL is empty
-	if [ -n "$url" ]; then
+	if [[ -n "$url" ]]; then
 	    # Remove 'file://' prefix if present
 	    if [[ "$url" == file://* ]]; then
-	        url=${url#file://}
-	        if [[ $(file --extension "$url" | awk '{print $2}') != "png" ]]; then
-	            magick "$url" -resize 128x128 png:"$url"
-	        fi
-	        echo "$url"
-	    fi
-	
+	        cover=${url#file://}
 	    # Process the URL if it starts with 'http' or 'https'
-	    if [[ "$url" == http://* || "$url" == https://* ]]; then
-	        cache_dir="$HOME/.cache/playerctl"
-	        mkdir -p "$cache_dir"
-	        filename=$(basename "$url")
-	        destination="$cache_dir/$filename"
-	
+		elif [[ "$url" == http://* || "$url" == https://* ]]; then
 	        # Download the file only if it does not exist
-	        if [ ! -f "$destination" ]; then
-	            curl -s "$url" | magick - -resize 128x128 png:"$destination"
+	        if [[ ! -f "$cover" ]]; then
+	            curl -s "$url" > "$cover"
 	        fi
-	        echo "$destination"
 	    fi
+        echo "$cover"
 	fi
 }
 
@@ -171,11 +170,11 @@ case "$1" in
         ;;
     "--player")
         player_name
-        echo "$icon"
+        echo "$player_name"
         ;;
     "--icon")
         player_icon
-        echo "$icon"
+        echo "$player_icon"
         ;;
     "--polybar" | "--polybar-minimal")
         case "$playerctl_status" in
@@ -203,6 +202,7 @@ case "$1" in
         esac
         ;;
     "--scroll")
+		command -v zscroll >/dev/null || echo '[!] zscroll is not installed'
 		# zscroll is used to scroll text in Polybar
 		zscroll -l 50 \
 	        --delay 0.7 \
@@ -213,4 +213,7 @@ case "$1" in
 	        --update-check true "$0 --polybar" &
 		wait
         ;;
+    *)
+		echo "${0##*/}: invalid option $1"
+    ;;
 esac

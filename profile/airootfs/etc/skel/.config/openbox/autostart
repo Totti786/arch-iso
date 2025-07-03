@@ -6,10 +6,14 @@
 [[ ! $(pgrep -f polkit-gnome-authentication-agent) ]] && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 # Restore Wallpaper
-wpgtk restore &
+wpgtk --restore &
 
 # Screenlocker
+killall -q -9 xss-lock
 xss-lock --ignore-xss -l lockscreen &
+
+# D-Bus
+dbus-update-activation-environment --all
 
 # xfce4-settings daemon
 xfsettingsd &
@@ -28,9 +32,6 @@ dunst &
 # Compositor 
 compositor --start &
 
-# Ambient light manager
-clight &
-
 # Touchpad Gestures
 if libinput list-devices | grep -qiw 'Touchpad'; then
 	killall -q -9 fusuma
@@ -48,8 +49,6 @@ copyq --start-server &
 
 # Plank (Dock)
 plank &
-
-nm-applet & 
 
 # Conky
 conky.sh &

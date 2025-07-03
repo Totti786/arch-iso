@@ -1,6 +1,3 @@
-# DO NOT EDIT! This file will be overwritten by nwg-look.
-# Any customization should be done in ~/.gtkrc-2.0.mine instead.
-
 include "/home/tarek/.gtkrc-2.0.mine"
 gtk-theme-name="FlatColor"
 gtk-icon-theme-name="Papirus-Dark"

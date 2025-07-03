@@ -7,11 +7,10 @@ set -e -u
 ## -------------------------------------------------------------- ##
 
 # Get new user's username
-new_user=`cat /etc/passwd | grep "/home" | cut -d: -f1 | head -1`
+new_user=$(cat /etc/passwd | grep "/home" | cut -d: -f1 | head -1)
 
 ## Modify /etc/mkinitcpio.conf file
 sed -i '/etc/mkinitcpio.conf' \
-	-e "s/base udev/base udev plymouth/g" \
 	-e "s/#COMPRESSION=\"zstd\"/COMPRESSION=\"zstd\"/g"
 
 ## Fix Initrd Generation in Installed System
@@ -47,13 +46,28 @@ sed -i -e 's#SHELL=.*#SHELL=/bin/zsh#g' /etc/default/useradd
 ## Copy Few Configs Into Root Dir
 rdir="/root/.config"
 sdir="/etc/skel"
-if [[ ! -d "$rdir" ]]; then
-	mkdir "$rdir"
-fi
 
-cp -r /etc/skel/.config /root
-cp -r /etc/skel/.icons /root
-cp -r /etc/skel/.local /root
+# Ensure /root/.config exists
+mkdir -p "$rdir"
+
+# List of files and directories to copy
+items=(
+	".config"
+	".cache"
+	".local"
+	".icons"
+	".vim"
+	".vimrc"
+	".zprofile"
+	".zshrc"
+)
+
+# Copy each item if it exists
+for item in "${items[@]}"; do
+	if [[ -e "$sdir/$item" ]]; then
+		cp -r "$sdir/$item" /root/
+	fi
+done
 
 # -------------------------------------------------------------- ##
 
@@ -90,25 +104,24 @@ for app in "${apps[@]}"; do
 	fi
 done
 
+## Fix lsp entries clutter
+for entry in /usr/share/applications/in.lsp_plug.lsp_plugins_*; do sed -i '$a NoDisplay=true' "$entry" ;done
+
 ## -------------------------------------------------------------- ##
 
 # Fix permissions for all the scripts
 
 # Make all the scripts excutable
-declare -a directory=(ags bspwm openbox i3 polybar jgmenu rofi zathura)
+directories=(quickshell hypr bspwm openbox i3 polybar jgmenu rofi)
 
-getfiles(){
-	for i in "${directory[@]}"; do
-		files=$(file $(find "/home/${new_user}/.config/$i" "/home/${new_user}/.local/bin" -type f) | grep  "script")
-		file="$( echo "$files" | cut -d ":" -f1)"
-		echo "$file"
-	done
-}
-
-getfiles > /tmp/shell-files
-
-for i in $(cat /tmp/shell-files); do 
-	chmod +x "$i"
-done && echo "Done!"
+# Find and make script files executable
+for dir in "${directories[@]}"; do
+    find "/home/${new_user}/.config/$dir" "/home/${new_user}/.local/bin" -type f 2>/dev/null | \
+    while read -r file; do
+        if file "$file" | grep -q "script"; then
+            chmod +x "$file"
+        fi
+    done
+done
 
 ## -------------------------------------------------------------- ##

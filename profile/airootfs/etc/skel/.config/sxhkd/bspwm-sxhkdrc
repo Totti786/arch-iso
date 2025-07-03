@@ -52,7 +52,7 @@ super + {q,c}
 	bspc node -c
 
 # Split horizontal, vertical or cancel
-super + ctrl + {h,v,q}
+super + shift + {h,v,q}
 	bspc node -p {east,south,cancel}
 
 # Preselect the ratio

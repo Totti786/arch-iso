@@ -2,8 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-export PATH=$PATH:~/.scripts/
+export ZSH="/usr/share/oh-my-zsh/"
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -11,17 +10,23 @@ export PATH=$PATH:~/.scripts/
 ZSH_THEME="robbyrussell"
 
 plugins=(
-    zsh-autosuggestions
-    zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # User configuration
 export HISTORY_IGNORE="(ls|cd|cls|clear|pwd|exit|sudo reboot|history|cd -|cd ..)"
 
 # fzf key bindings
 source <(fzf --zsh)
+
+# Set default mime types
+export EDITOR="vim"
+export VISUAL="geany"
+export BROWSER="firefox"
+export TERMINAL="alacritty"
 
 # ls
 alias  l='ls -lh'
@@ -41,7 +46,8 @@ alias gc='git commit -m'
 alias gp='git push origin master'
 
 # pacman 
-alias pacs='sudo pacman -S'
+#alias pacs='sudo pacman -S'
+alias pacs='yay -S $1 --needed'
 alias pacr='sudo pacman -Rcns'
 alias pacu='sudo pacman -Syu'
 

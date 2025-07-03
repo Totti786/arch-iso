@@ -19,19 +19,21 @@ info_file="$HOME/.local/bin/info"
 if [[ -f "$info_file" ]]; then
     source "$info_file"
 else
-    cat > "$info_file" <<- EOF
-    ## Weather data
-    # You need to get a free API key from https://home.openweathermap.org for the script to be functional 
-    KEY=""  # Put your OpenWeather API key here
-    
-    # You also need to sign up on https://www.weatherbit.io/account/create  
-    # In order to use all the features of this script, you need to sign up for an API key
-    WBKEY=""  # Put your WeatherBit API key here 
-    
-    UNIT="metric"    # Available options: 'metric' or 'imperial'
-    COUNTRY=""       # Put your country name here 
-    CITY=""          # Put your city name here
-	EOF
+	cat > "$info_file"  <<- _EOF_
+		#!/usr/bin/env bash
+		
+		## Weather data
+		# you need to get a free API key from https://home.openweathermap.org for the script to be functional 
+		KEY="9db8910d883726866ecc1dac1216708d"  # put your Opeanweather API key here
+		
+		# you also need to sign up on https://www.weatherbit.io/account/create  
+		# in order to use all the features of this script you need to sign up for an API key
+		WBKEY=""  # put your WeatherBit API key here 
+		
+		UNIT="metric"	# Available options : 'metric' or 'imperial'
+		COUNTRY="" # put your country name here 
+		CITY="" # put your city name here
+	_EOF_
 fi
 
 # Directory for caching weather data
@@ -71,15 +73,15 @@ get_weather_data() {
             precipitation=$(echo "$altweather" | jq -r ".data[].precip")
             
             # Save additional weather data to cache
-            cat > "$cache_weather_rofi" <<- EOF
-            City: $city 
-            Dew Point: $dewpt°C 
-            Humidity: $humidity% 
-            UV Index: $uv 
-            Air Quality: $aqi
-            Precipitation: $(printf "%.2f" "$precipitation")%
-            Windspeed: $windspeed m/s
-			EOF
+            cat > "$cache_weather_rofi" <<- _EOF_
+				City: $city 
+				Dew Point: $dewpt°C 
+				Humidity: $humidity% 
+				UV Index: $uv 
+				Air Quality: $aqi
+				Precipitation: $(printf "%.2f" "$precipitation")%
+				Windspeed: $windspeed m/s
+				_EOF_
         fi
         
         # Determine the weather icon based on the icon code
@@ -107,7 +109,7 @@ get_weather_data() {
 
     else
         # Fetch fallback weather data from wttr.in if OpenWeather API fails
-        wttr=$(curl wttr.in/"$CITY"?format="%t+%C\n")
+        wttr=$(wget -qO- "http://wttr.in/$CITY?format=%t+%C\n")
         if [[ -n "$wttr" ]]; then
             echo "$wttr" > "${cache_weather_stat}"
         else 
